@@ -75,7 +75,13 @@ def safe_get(p, last_try=False):
     
     ret = None
     try:
-        ret = p.get()
+        
+        try:
+            with p.root_instrument.output_enabled.set_to(True):
+                ret = p.get()
+        except Exception:
+            ret = p.get()
+        
     except Exception as e:
         if last_try is False:
             print(f"Couldn't get {p.name}. Trying again.", e)
@@ -180,7 +186,7 @@ def save_to_csv(ds, fn=None, use_labels=True):
         export_ds.to_csv(fn)
     else:
         db_path = ds.path_to_db.split('\\')
-        db = db_path[len(db_path)-1].split('.')[0]
+        db = db_path[len(db_path-1)].split('.')[0]
 
         fp = f'{os.environ["MeasureItHome"]}\\Origin Files\\{db}\\'
         if not os.path.isdir(fp):

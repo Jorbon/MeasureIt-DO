@@ -81,6 +81,9 @@ class Sweep2D(BaseSweep, QObject):
     """
 
     add_heatmap_lines = pyqtSignal(list)
+    
+    def flip_direction(self):
+        self.print_main.emit("Can't flip the direction of a 2d sweep.")
 
     def __init__(self, in_params, out_params, outer_delay=1, update_func=None, *args, **kwargs):
         """
@@ -326,7 +329,9 @@ class Sweep2D(BaseSweep, QObject):
             return
 
         # Update our heatmap!
-        lines = self.in_sweep.plotter.axes[1].get_lines()
+        lines = []
+        for i in range(len(self._params) - 1):
+            lines.append(self.in_sweep.plotter.axes[i + 1].get_lines())
         self.add_heatmap_lines.emit(lines)
 
         # Check our update condition
